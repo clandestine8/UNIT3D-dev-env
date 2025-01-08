@@ -1,15 +1,24 @@
 # UNIT3D Dev Enviroment
 
-### Setup (Requires Docker & Docker Compose)
+### Prerequisites
+
+- Linux or WSL2 (Files must be inside WSL2 VHD Disk)
+- Docker & Docker Compose
+- Git (or Archive of Unit3d Repo)
+- Bun: `curl -fsSL https://bun.sh/install | bash` 
+
+
+### Setup
 
 1. Clone The Dev Environment Repo or Extract the Archive
 2. Run `docker compose build`
 3. Run `docker compose pull`
 4. Run `git clone https://github.com/HDInnovations/UNIT3D-Community-Edition.git ./Repos/UNIT3D`
-5. Run `cd ./Repos/UNIT3D && bun update && composer update --ignore-platform-req=*`
+5. Run `cd ./Repos/UNIT3D && bun update`
 6. Run `cp .env.example .env && touch laravel-echo-server.json` & then edit the .env & laravel-echo-server.json file with your setting from the `docker-compose.yml` file in the root directory.
 7. Run `cd ../.. && docker compose up -d`
 8. Run `docker compose exec unit3d /usr/bin/first`
+9. Run `docker compose exec unit3d composer update`
 
 
 
