@@ -1,0 +1,22 @@
+unit3d.localhost {
+	tls internal
+	root * /srv/UNIT3D/public
+	php_fastcgi unix//var/run/unit3d/www.sock {
+        	root /var/www/public
+	}
+	reverse_proxy /socket.io/* unit3d:8443 {
+        transport http {
+        }
+    }
+	file_server
+	encode gzip
+}
+phpmyadmin.localhost {
+  	tls internal
+	reverse_proxy phpmyadmin:80
+}
+
+mailpit.localhost {
+  	tls internal
+	reverse_proxy mailpit:8025
+}

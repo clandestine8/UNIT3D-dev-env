@@ -1,0 +1,132 @@
+services:
+
+######
+#APPS#
+######
+
+
+##
+#unit3d
+    unit3d:
+        build:
+            dockerfile: ./Docker/fedora-php-fpm.Dockerfile
+        restart: always
+        expose:
+            - 9000
+            - 8443
+        volumes:
+            - ./Repos/UNIT3D/:/var/www
+            - unit3d-socket:/var/run/unit3d
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.5
+        extra_hosts:
+            unit3d.localhost: "172.16.238.10"
+##
+
+##########
+#SERVICES#
+##########
+##
+    caddy:
+        image: caddy:alpine
+        restart: unless-stopped
+        depends_on:
+          - unit3d
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.10
+        ports:
+            - 127.0.0.1:80:80
+            - 127.0.0.1:443:443
+            - 127.0.0.1:443:443/udp
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            - ./Repos:/srv
+            - ./Services/caddy/data:/data
+            - ./Services/caddy/config:/config
+            - unit3d-socket:/var/run/unit3d
+##
+    mysql:
+        image: mysql:8.0
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: "SuperSecurePassword"
+            MYSQL_ROOT_HOST: "%"
+            MYSQL_DATABASE: 'unit3d'
+            MYSQL_USER: 'unit3d'
+            MYSQL_PASSWORD: 'Unit3d!!'
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.11
+        volumes:
+            - ./Services/mysql/:/var/lib/mysql
+        ports:
+            - 127.0.0.1:3306:3306
+##
+    meilisearch:
+        restart: always
+        image: getmeili/meilisearch:v1.12
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.12
+        environment:
+            MEILI_MASTER_KEY: "MASTER_KEY"
+        volumes:
+            - ./Services/meilisearch/:/meili_data
+        expose:
+            - 7700
+        ports:
+            - 127.0.0.1:7700:7700
+
+##
+
+    redis:
+        restart: always
+        image: redis:7
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.13
+        expose:
+            - 6379
+        ports:
+            - 127.0.0.1:6379:6379
+##
+    mailpit:
+        restart: always
+        image: axllent/mailpit
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.15
+        expose:
+            - 1025
+            - 8025
+        ports:
+            - 8025:8025
+
+##
+    phpmyadmin:
+        image: phpmyadmin:latest
+        restart: always
+        networks:
+          front-tier:
+            ipv4_address: 172.16.238.14
+        environment:
+            PMA_ABSOLUTE_URI: "https://phpmyadmin.localhost/"
+            PMA_HOST: mysql
+            PMA_USER: root
+            PMA_PASSWORD: "SuperSecurePassword"
+            UPLOAD_LIMIT: 10G
+            MEMORY_LIMIT: 2G
+            MAX_EXECUTION_TIME: 600
+
+networks:
+  front-tier:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"
+
+
+volumes:
+  unit3d-socket:
