@@ -1,4 +1,4 @@
-# UNIT3D Dev Enviroment
+# UNIT3D Dev Environment
 
 ### Prerequisites
 
