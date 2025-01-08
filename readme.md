@@ -31,7 +31,7 @@ APP_DEBUG=true
 APP_LOG_LEVEL=debug
 APP_URL=https://unit3d.localhost
 
-MIX_ECHO_ADDRESS=https://://unit3d.localhost
+MIX_ECHO_ADDRESS=https://unit3d.localhost
 
 LARAVEL_ECHO_SERVER_HOST=unit3d
 LARAVEL_ECHO_SERVER_PORT=8443
